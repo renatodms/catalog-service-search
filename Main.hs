@@ -23,29 +23,50 @@ import Data.Default.Class
 import Network.HTTP.Req
 
 --definicoes de tipos (convertidos para JSON)
-data Film = Film { filmId :: Int, name :: String } deriving (Show, Generic)
-instance ToJSON Film
-instance FromJSON Film
+data Epsode = Epsode { epsodeTitle :: String, epNumber :: Int } deriving (Show, Generic)
+instance ToJSON Epsode
+instance FromJSON Epsode
+
+data Serie = Serie { serieId :: Int, serieTitle :: String, reusme :: String, launchDate :: String, coverLink :: String, seasons :: [Epsode], commentsId :: [Int] } deriving (Show, Generic)
+instance ToJSON Serie
+instance FromJSON Serie
 
 --recuperacao dos dados (CRUD de filmes)
-getAll :: IO [Film]
-getAll = runReq def $ do
+getAllEpsodes :: IO [Epsode]
+getAllEpsodes = runReq def $ do
   r <- req GET -- metodo
-    (http "localhost" /: "filmList") --url tipo: (http "host" /: "path1" /: "path2" ...)
+    (http "localhost" /: "epsodes") --url tipo: (http "host" /: "path1" /: "path2" ...)
     NoReqBody -- precisa dizer o que vai mandar do corpo, mesmo que seja nada
     jsonResponse -- o formato da resposta
     mempty       -- mostrar detalhes na resposta
-  liftIO $ return (responseBody r :: [Film])
+  liftIO $ return (responseBody r :: [Epsode])
+
+getAllSeries :: IO [Serie]
+getAllSeries = runReq def $ do
+  r <- req GET
+    (http "localhost" /: "series")
+    NoReqBody
+    jsonResponse
+    mempty
+  liftIO $ return (responseBody r :: [Serie])
 
 --configuracao de endpoints
 main :: IO ()
 main = do
   putStrLn "smell like it's working..."
-  allFilms <- getAll
+  allEpsodes <- getAllEpsodes
+  allSeries <- getAllSeries
   scotty 3000 $ do
-    get "/search" $ do
-      json allFilms
+    get "/series" $ do
+      json allSeries
     
-    get "/search/:filterString" $ do
+    get "/series/:filterString" $ do
+      filterString <- param "filterString"
+      json (filterString :: String)
+
+    get "/episodes" $ do
+      json allEpsodes
+      
+    get "/episodes/:filterString" $ do
       filterString <- param "filterString"
       json (filterString :: String)
