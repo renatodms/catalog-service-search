@@ -57,16 +57,16 @@ main = do
   allEpisodes <- getAllEpisodes
   allSeries <- getAllSeries
   scotty 3000 $ do
-    get "/series" $ do
+    get "/search/series" $ do
       json allSeries
     
-    get "/series/:filterString" $ do
+    get "/search/series/:filterString" $ do
       filterString <- param "filterString"
       json (filterString :: String)
 
-    get "/episodes" $ do
+    get "/search/episodes" $ do
       json allEpisodes
       
-    get "/episodes/:filterString" $ do
+    get "/search/episodes/:filterString" $ do
       filterString <- param "filterString"
       json (filterString :: String)
