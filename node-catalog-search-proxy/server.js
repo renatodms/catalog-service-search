@@ -10,29 +10,36 @@ app.get('/:path', (req, res) => {
         login: "node-catalog-search-proxy",
         password: "gambs666"
     },
-    host = 'http://ec2-54-187-46-109.us-west-2.compute.amazonaws.com:31885/';
+    host = 'http://ec2-54-187-127-131.us-west-2.compute.amazonaws.com:31514/';
 
-    request({
-        method: 'POST',
-        uri: host+'login',
-        body: credentials,
-        json: true
-    }).then(result => {
+    //request({
+    //    method: 'POST',
+    //    uri: host+'login',
+    //    body: credentials,
+    //    json: true
+    //}).then(result => {
 
         request({
             method: 'GET',
-            uri: host+'csd/api/'+path,
+            uri: host+'api/'+path,
             headers: {
-                token: result
+                token: 'uE60yfGo2W9RWvLjqZYAbvz60ZjgZ2reXIMOgUchLGd-JnrZNAKsCWclUCzxzhPmnV0-oujD-NBG9_AR7gYvahzHrZpMe6tPH7YgRtmNVwit03fhvY_dtg==',
+                ID: 0
             },
             json: true
         }).then(result => {
 
-            res.status(200).send(result);
+            if(path == 'series') res.status(200).send(result.series.map(element => {
+                return { serieId: element.id, serieTitle: element.title, serieAbout: element.about, serieLaunch_date: element.launch_date, serieNumber_of_seasons: element.number_of_seasons };
+            }));
+
+            if(path == 'episodes') res.status(200).send(result.episodes.map(element => {
+                return { serie: { serieId: element.serie.id, serieTitle: element.serie.title, serieAbout: element.serie.about, serieLaunch_date: element.serie.launch_date, serieNumber_of_seasons: element.serie.number_of_seasons }, seasonTitle : element.season.title };
+            }));
 
         }).catch(err => res.status(500).send(err));
 
-    }).catch(err => res.status(500).send(err));
+    //}).catch(err => res.status(500).send(err));
 });
 
 http.listen(80, () => {
