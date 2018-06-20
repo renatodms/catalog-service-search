@@ -1,7 +1,5 @@
 {-
 TODOs
-  atualizar tipo de dado (Film)
-  atualizar endpoint do CRUD de filmes
   algoritmo de filtro do /search/:filterString
 -}
 
@@ -23,24 +21,15 @@ import Data.Default.Class
 import Network.HTTP.Req
 
 --definicoes de tipos (convertidos para JSON)
-data Epsode = Epsode { epsodeTitle :: String, epNumber :: Int } deriving (Show, Generic)
-instance ToJSON Epsode
-instance FromJSON Epsode
-
-data Serie = Serie { serieId :: Int, serieTitle :: String, reusme :: String, launchDate :: String, coverLink :: String, seasons :: [Epsode], commentsId :: [Int] } deriving (Show, Generic)
+data Serie = Serie { serieId :: Int, serieTitle :: String, serieAbout :: String, serieLaunch_date :: String{-, serieNumber_of_seasons :: Int-} } deriving (Show, Generic)
 instance ToJSON Serie
 instance FromJSON Serie
 
---recuperacao dos dados (CRUD de filmes)
-getAllEpsodes :: IO [Epsode]
-getAllEpsodes = runReq def $ do
-  r <- req GET -- metodo
-    (http "localhost" /: "epsodes") --url tipo: (http "host" /: "path1" /: "path2" ...)
-    NoReqBody -- precisa dizer o que vai mandar do corpo, mesmo que seja nada
-    jsonResponse -- o formato da resposta
-    mempty       -- mostrar detalhes na resposta
-  liftIO $ return (responseBody r :: [Epsode])
+data Episode = Episode { serie :: Serie, seasonTitle :: String } deriving (Show, Generic)
+instance ToJSON Episode
+instance FromJSON Episode
 
+--recuperacao dos dados (CRUD de filmes)
 getAllSeries :: IO [Serie]
 getAllSeries = runReq def $ do
   r <- req GET
@@ -50,11 +39,22 @@ getAllSeries = runReq def $ do
     mempty
   liftIO $ return (responseBody r :: [Serie])
 
+getAllEpisodes :: IO [Episode]
+getAllEpisodes = runReq def $ do
+  r <- req GET -- metodo
+    (http "localhost" /: "episodes") --url tipo: (http "host" /: "path1" /: "path2" ...)
+    NoReqBody -- precisa dizer o que vai mandar do corpo, mesmo que seja nada
+    jsonResponse -- o formato da resposta
+    mempty       -- mostrar detalhes na resposta
+  liftIO $ return (responseBody r :: [Episode])
+  
+  
+
 --configuracao de endpoints
 main :: IO ()
 main = do
   putStrLn "smell like it's working..."
-  allEpsodes <- getAllEpsodes
+  allEpisodes <- getAllEpisodes
   allSeries <- getAllSeries
   scotty 3000 $ do
     get "/series" $ do
@@ -65,7 +65,7 @@ main = do
       json (filterString :: String)
 
     get "/episodes" $ do
-      json allEpsodes
+      json allEpisodes
       
     get "/episodes/:filterString" $ do
       filterString <- param "filterString"
