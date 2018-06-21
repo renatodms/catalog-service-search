@@ -10,7 +10,7 @@ app.get('/:path', (req, res) => {
         login: "node-catalog-search-proxy",
         password: "gambs666"
     },
-    host = 'http://ec2-54-187-127-131.us-west-2.compute.amazonaws.com:31514/';
+    host = 'http://csd-crud/';
 
     //request({
     //    method: 'POST',

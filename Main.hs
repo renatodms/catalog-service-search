@@ -33,7 +33,7 @@ instance FromJSON Episode
 getAllSeries :: IO [Serie]
 getAllSeries = runReq def $ do
   r <- req GET
-    (http "127.0.0.1" /: "series")
+    (http "csd-search-gateway" /: "series")
     NoReqBody
     jsonResponse
     mempty
@@ -42,7 +42,7 @@ getAllSeries = runReq def $ do
 getAllEpisodes :: IO [Episode]
 getAllEpisodes = runReq def $ do
   r <- req GET -- metodo
-    (http "127.0.0.1" /: "episodes") --url tipo: (http "host" /: "path1" /: "path2" ...)
+    (http "csd-search-gateway" /: "episodes") --url tipo: (http "host" /: "path1" /: "path2" ...)
     NoReqBody -- precisa dizer o que vai mandar do corpo, mesmo que seja nada
     jsonResponse -- o formato da resposta
     mempty       -- mostrar detalhes na resposta
@@ -56,7 +56,7 @@ main = do
   putStrLn "smell like it's working..."
   allEpisodes <- getAllEpisodes
   allSeries <- getAllSeries
-  scotty 3000 $ do
+  scotty 80 $ do
     get "/search/series" $ do
       json allSeries
     

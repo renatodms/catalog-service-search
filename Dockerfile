@@ -9,5 +9,5 @@ RUN cabal install req
 RUN cabal install scotty
 
 #install and run service
-RUN git clone https://github.com/ahlp/catalog-service-search/
-RUN runghc ./catalog-service-search/Main.hs
+COPY ./ catalog-service-search/
+ENTRYPOINT [ "runghc", "./catalog-service-search/Main.hs" ]
